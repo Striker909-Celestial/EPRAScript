@@ -26,6 +26,21 @@ public class Map<I, O> {
 
     // Subclasses
 
+    /// A recursive parsing function used in the definition if [Many0] and [Many1].
+    /// @param parser The parser to be used
+    /// @param s The string to be parsed
+    /// @return A token with an array list of all continuous values of successful parses,
+    ///  starting at the beginning of the string
+    private static <T> Token<ArrayList<T>> many(Parser<T> parser, String s) {
+        Token<T> t = parser.parse(s);
+        // Fail or discontinuity -> empty array list
+        if (!t.success() || !t.head().isEmpty()) { return new Token<>(new ArrayList<>(), "", s, true); }
+        // Parse follow, add the value from the last parse to the front
+        Token<ArrayList<T>> out = many(parser, t.follow());
+        out.value().addFirst(t.value());
+        return out;
+    }
+
     /// A [Map] that maps a [Parser] of type [T] onto a [Parser] of type [`ArrayList<T>`](ArrayList).
     ///
     /// The parser will be applied to a string repeatedly until either the parser fails
@@ -45,21 +60,11 @@ public class Map<I, O> {
         ///
         /// The returned parser will not fail, even if the input parser fails on the first run.
         public Many0() {
-            super(parser -> new Parser<ArrayList<T>>(s -> {
-                ArrayList<T> out = new ArrayList<>();
+            super(parser -> new Parser<>(s -> {
                 Token<T> t = parser.parse(s);
-                String head = t.head();
-                out.add(t.value());
-                String f = t.follow();
-                while (t.success() && !f.isEmpty()) {
-                    t = parser.parse(s);
-                    if (f.length() - 1 != t.follow().length()) {
-                        break;
-                    }
-                    out.add(t.value());
-                    f = t.follow();
-                }
-                return new Token<>(out, head, f, true);
+                Token<ArrayList<T>> out = many(parser, t.follow());
+                out.value().addFirst(t.value());
+                return new Token<>(out.value(), t.head(), out.follow(), true);
             }));
         }
     }
@@ -82,22 +87,12 @@ public class Map<I, O> {
         ///
         /// The returned parser will fail if the input parser fails on the first run.
         public Many1() {
-            super(parser -> new Parser<ArrayList<T>>(s -> {
-                ArrayList<T> out = new ArrayList<>();
+            super(parser -> new Parser<>(s -> {
                 Token<T> t = parser.parse(s);
-                String head = t.head();
                 if (!t.success()) { return new Token<>(new ArrayList<>(), "", s, false); }
-                out.add(t.value());
-                String f = t.follow();
-                while (t.success() && !f.isEmpty()) {
-                    t = parser.parse(f);
-                    if (f.length() - 1 != t.follow().length()) {
-                        break;
-                    }
-                    out.add(t.value());
-                    f = t.follow();
-                }
-                return new Token<>(out, head, f, true);
+                Token<ArrayList<T>> out = many(parser, t.follow());
+                out.value().addFirst(t.value());
+                return new Token<>(out.value(), t.head(), out.follow(), true);
             }));
         }
     }
