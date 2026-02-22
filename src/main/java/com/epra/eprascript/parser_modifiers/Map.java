@@ -1,12 +1,15 @@
-package com.epra.eprascript;
+package com.epra.eprascript.parser_modifiers;
+
+import com.epra.eprascript.basic_parsers.Parser;
+import com.epra.eprascript.basic_parsers.Token;
 
 import java.util.ArrayList;
 import java.util.function.Function;
 
 /// A [Function] that maps a [Parser] of type [I] onto a [Parser] of type [O].
 ///
-/// Queer Coded by Striker-909.
-/// If you use this class or a method from this class in its entirety, please make sure to give credit.
+/// @author Striker-909
+/// @since v0.0.0
 public class Map<I, O> {
 
     private final Function<Parser<I>, Parser<O>> map;
