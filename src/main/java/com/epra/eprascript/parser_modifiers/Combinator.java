@@ -1,11 +1,14 @@
-package com.epra.eprascript;
+package com.epra.eprascript.parser_modifiers;
+
+import com.epra.eprascript.basic_parsers.Parser;
+import com.epra.eprascript.basic_parsers.Token;
 
 import java.util.function.BiFunction;
 
 /// A [BiFunction] that combines two [`Parsers`](Parser) to form a new [Parser].
 ///
-/// Queer Coded by Striker-909.
-/// If you use this class or a method from this class in its entirety, please make sure to give credit.
+/// @author Striker-909
+/// @since v0.0.0
 public class Combinator {
 
     private final BiFunction<Parser<?>, Parser<?>, Parser<?>> combine;
@@ -44,24 +47,31 @@ public class Combinator {
     /// - If only one [Parser] succeeds, returns the output of that [Parser].
     /// - If both [`Parsers`](Parser) succeed, returns the output with the longest `follow`,
     /// or the output of the first parser if the two `follows` have the same length.
+    @SuppressWarnings("unchecked")
     public static final Combinator OR = new Combinator(
             (p1, p2) -> new Parser(
                     s -> {
                         Token<?> t = p1.parse(s.toString());
                         Token<?> u = p2.parse(s.toString());
-                        if (t.success() && !u.success()) { return t; }
-                        if (u.success() && !t.success()) { return u; }
+                        if (t.success() && !u.success()) {
+                            return t;
+                        }
+                        if (u.success() && !t.success()) {
+                            return u;
+                        }
                         if (!t.success()) { return new Token<>(null, "", s.toString(), false); }
                         if (t.follow().length() >= u.follow().length()) { return t; }
                         return u;
                     }
             )
     );
+
     /// A [Combinator] that applies an `and` [BiFunction] to the success of two [`Parsers`](Parser).
     ///
     /// - If both [`Parsers`](Parser) succeed, returns the output with the longest `follow`,
     /// or the output of the first parser if the two `follows` have the same length.
     /// - Otherwise, returns a [Token] with `null` value and success as `false`.
+    @SuppressWarnings("unchecked")
     public static final Combinator AND = new Combinator(
             (p1, p2) -> new Parser(
                     s -> {
@@ -78,6 +88,7 @@ public class Combinator {
     /// - If both [`Parsers`](Parser) succeed, returns the output of the first [Parser],
     /// or the output of the first parser if the two `follows` have the same length.
     /// - Otherwise, returns a [Token] with `null` value and success as `false`.
+    @SuppressWarnings("unchecked")
     public static final Combinator AND_1 = new Combinator(
             (p1, p2) -> new Parser(
                     s -> {
@@ -93,6 +104,7 @@ public class Combinator {
     /// - If both [`Parsers`](Parser) succeed, returns the output of the second [Parser],
     /// or the output of the first parser if the two `follows` have the same length.
     /// - Otherwise, returns a [Token] with `null` value and success as `false`.
+    @SuppressWarnings("unchecked")
     public static final Combinator AND_2 = new Combinator(
             (p1, p2) -> new Parser(
                     s -> {
@@ -100,6 +112,20 @@ public class Combinator {
                         Token<?> u = p2.parse(s.toString());
                         if (!t.success() || !u.success()) { return new Token<Object>(null, "", s.toString(), false); }
                         return u;
+                    }
+            )
+    );
+    /// A [Combinator] that combines two [Parsers](Parser) in order.
+    ///
+    /// - If the first parser successfully parses the input, that output will be returned.
+    /// - Otherwise, the output of the second parser on the input is returned.
+    @SuppressWarnings("unchecked")
+    public static final Combinator SEQUENCE = new Combinator(
+            (p1, p2) -> new Parser(
+                    s -> {
+                        Token<?> t = p1.parse(s.toString());
+                        if (t.success()) { return t; };
+                        return p2.parse(s.toString());
                     }
             )
     );

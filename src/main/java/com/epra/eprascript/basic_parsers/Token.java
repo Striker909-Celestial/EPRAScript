@@ -1,9 +1,9 @@
-package com.epra.eprascript;
+package com.epra.eprascript.basic_parsers;
 
 /// The output produced by a [Parser].
 ///
-/// Queer Coded by Striker-909.
-/// If you use this class or a method from this class in its entirety, please make sure to give credit.
+/// @author Striker-909
+/// @since v0.0.0
 /// @param value The value returned by the parser
 /// @param head The section of the string before the parsed section
 /// @param follow The section of the spring after the parsed section

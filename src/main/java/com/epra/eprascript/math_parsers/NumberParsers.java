@@ -1,7 +1,16 @@
-package com.epra.eprascript;
+package com.epra.eprascript.math_parsers;
+
+import com.epra.eprascript.basic_parsers.CharParser;
+import com.epra.eprascript.parser_modifiers.Combinator;
+import com.epra.eprascript.parser_modifiers.Map;
+import com.epra.eprascript.basic_parsers.Token;
+import com.epra.eprascript.basic_parsers.Parser;
 
 import java.util.ArrayList;
 
+/// A group of [Parsers](Parser) that convert text into numerical values.
+/// @author Striker-909
+/// @since v0.0.0
 public class NumberParsers {
 
     /// A [Map] from a [Character] [Parser] to an [Integer] [Parser].
@@ -30,16 +39,16 @@ public class NumberParsers {
     /// A [Parser] that succeeds at the first digit [Character] within the intput [String].
     @SuppressWarnings("unchecked")
     public static final Parser<Character> RAW_DIGIT_PARSER = (Parser<Character>) Combinator.OR.combine(
-            new Parser.CharParser('0'),
-            new Parser.CharParser('1'),
-            new Parser.CharParser('2'),
-            new Parser.CharParser('3'),
-            new Parser.CharParser('4'),
-            new Parser.CharParser('5'),
-            new Parser.CharParser('6'),
-            new Parser.CharParser('7'),
-            new Parser.CharParser('8'),
-            new Parser.CharParser('9')
+            new CharParser('0'),
+            new CharParser('1'),
+            new CharParser('2'),
+            new CharParser('3'),
+            new CharParser('4'),
+            new CharParser('5'),
+            new CharParser('6'),
+            new CharParser('7'),
+            new CharParser('8'),
+            new CharParser('9')
     );
     /// A [Parser] that succeeds at the first digit [Character] within the intput [String],
     /// and converts that [Character] into an [Integer].
@@ -88,7 +97,7 @@ public class NumberParsers {
                         Token<Number> token = parser.parse(s);
                         int l = token.head().length();
                         if (!token.success() || l == 0) { return token; }
-                        Parser.CharParser minus = new Parser.CharParser('-');
+                        CharParser minus = new CharParser('-');
                         if (minus.parse(token.head().substring(l - 1, l)).success()) {
                             return new Token<>((-1) * (Double) token.value(), token.head().substring(0, l - 1), token.follow(), true);
                         }
@@ -102,7 +111,7 @@ public class NumberParsers {
                 Token<Number> token = parser.parse(s);
                 int l = token.follow().length();
                 if (!token.success() || l == 0) { return token; }
-                Parser.CharParser dot = new Parser.CharParser('.');
+                CharParser dot = new CharParser('.');
                 if (!dot.parse(token.follow().substring(0, 1)).success()) { return token; }
                 Token<Double> decimal = DECIMAL_MAP.map(DIGIT_LIST_PARSER).parse(token.follow().substring(1));
                 if (!decimal.success()) { return token; }
