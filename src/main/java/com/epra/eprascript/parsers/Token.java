@@ -1,4 +1,4 @@
-package com.epra.eprascript.basic_parsers;
+package com.epra.eprascript.parsers;
 
 /// The output produced by a [Parser].
 ///

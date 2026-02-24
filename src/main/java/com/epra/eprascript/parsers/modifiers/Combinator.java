@@ -1,7 +1,7 @@
-package com.epra.eprascript.parser_modifiers;
+package com.epra.eprascript.parsers.modifiers;
 
-import com.epra.eprascript.basic_parsers.Parser;
-import com.epra.eprascript.basic_parsers.Token;
+import com.epra.eprascript.parsers.Parser;
+import com.epra.eprascript.parsers.Token;
 
 import java.util.function.BiFunction;
 

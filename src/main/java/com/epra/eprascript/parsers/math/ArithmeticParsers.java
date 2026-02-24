@@ -1,9 +1,9 @@
-package com.epra.eprascript.math_parsers;
+package com.epra.eprascript.parsers.math;
 
-import com.epra.eprascript.basic_parsers.FunctionParser;
-import com.epra.eprascript.parser_modifiers.Combinator;
-import com.epra.eprascript.basic_parsers.Token;
-import com.epra.eprascript.basic_parsers.Parser;
+import com.epra.eprascript.parsers.function.FunctionParser;
+import com.epra.eprascript.parsers.modifiers.Combinator;
+import com.epra.eprascript.parsers.Token;
+import com.epra.eprascript.parsers.Parser;
 
 /// A group of [Parsers](Parser) for parsing basic arithmetic functions.
 /// @author Striker-909
@@ -27,7 +27,7 @@ public class ArithmeticParsers {
                 double val1 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val1")).value();
                 double val2 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val2")).value();
                 //System.out.println(val1 + " + " + val2 + " = " + (val1 + val2));
-                return val1 + val2;
+                return () -> val1 + val2;
             }
     );
     /// A [`FunctionParser`](Parser#FunctionParser) for subtraction.
@@ -47,7 +47,7 @@ public class ArithmeticParsers {
                 double val1 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val1")).value();
                 double val2 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val2")).value();
                 //System.out.println(val1 + " - " + val2 + " = " + (val1 - val2));
-                return val1 - val2;
+                return () -> val1 - val2;
             }
     );
     /// A [`FunctionParser`](Parser#FunctionParser) for multiplication.
@@ -67,7 +67,7 @@ public class ArithmeticParsers {
                 double val1 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val1")).value();
                 double val2 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val2")).value();
                 //System.out.println(val1 + " * " + val2 + " = " + (val1 * val2));
-                return val1 * val2;
+                return () -> val1 * val2;
             }
     );
 
@@ -88,7 +88,7 @@ public class ArithmeticParsers {
                 double val1 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val1")).value();
                 double val2 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val2")).value();
                 //System.out.println(val1 + " / " + val2 + " = " + (val1 / val2));
-                return val1 / val2;
+                return () -> val1 / val2;
             }
     );
 
@@ -109,7 +109,7 @@ public class ArithmeticParsers {
                 double val1 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val1")).value();
                 double val2 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val2")).value();
                 //System.out.println(val1 + " // " + val2 + " = " + (double)(int)(val1 / val2));
-                return (double)(int)(val1 / val2);
+                return () -> (double)(int)(val1 / val2);
             }
     );
 
@@ -130,7 +130,7 @@ public class ArithmeticParsers {
                 double val1 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val1")).value();
                 double val2 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val2")).value();
                 //System.out.println(val1 + " % " + val2 + " = " + (val1 % val2));
-                return val1 % val2;
+                return () -> val1 % val2;
             }
     );
 
@@ -151,7 +151,7 @@ public class ArithmeticParsers {
                 double val1 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val1")).value();
                 double val2 = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val2")).value();
                 //System.out.println(val1 + " ^ " + val2 + " = " + Math.pow(val1, val2));
-                return Math.pow(val1, val2);
+                return () -> Math.pow(val1, val2);
             }
     );
 
@@ -171,7 +171,7 @@ public class ArithmeticParsers {
             inputs -> {
                 double val = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val")).value();
                 //System.out.println("|" + val + "| = " + Math.abs(val));
-                return Math.abs(val);
+                return () -> Math.abs(val);
             }
     );
 
@@ -191,7 +191,7 @@ public class ArithmeticParsers {
             inputs -> {
                 double val = NumberParsers.DOUBLE_PARSER.parse(inputs.get("val")).value();
                 //System.out.println("(" + val + ") = " + val);
-                return val;
+                return () -> val;
             }
     );
 

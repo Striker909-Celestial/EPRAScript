@@ -1,15 +1,11 @@
-package com.epra.eprascript.basic_parsers;
+package com.epra.eprascript.parsers;
 
-import com.epra.eprascript.parser_modifiers.Combinator;
-
-import java.util.HashMap;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /// A [Function] that parses a [String] input into an [Token] of type [T].
 /// @author Striker-909
 /// @since v0.0.0
-public class Parser<T>{
+public class Parser<T> {
     private final Function<String, Token<T>> parse;
     /// A [Function] that parses a [String] input into an output of type [T].
     /// @param parse The parser function
@@ -117,4 +113,3 @@ public class Parser<T>{
         return recursiveReplaceAll(replace(input, replacement), replacement);
     }
 }
-

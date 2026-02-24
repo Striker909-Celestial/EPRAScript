@@ -1,4 +1,7 @@
-package com.epra.eprascript.basic_parsers;
+package com.epra.eprascript.parsers.alphanumeric;
+
+import com.epra.eprascript.parsers.Parser;
+import com.epra.eprascript.parsers.Token;
 
 /// A [Parser] subclass that parses for a specific [Character].
 ///

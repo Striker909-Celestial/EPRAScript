@@ -1,4 +1,8 @@
-package com.epra.eprascript.basic_parsers;
+package com.epra.eprascript.parsers.function;
+
+import com.epra.eprascript.parsers.Parser;
+import com.epra.eprascript.parsers.alphanumeric.RegExParser;
+import com.epra.eprascript.parsers.Token;
 
 import java.util.HashMap;
 import java.util.function.Function;
@@ -93,8 +97,8 @@ public class FunctionParser<T> extends Parser<Supplier<T>> {
     /// permitted as a parameter input for the function
     /// @param variableParser A parser for variable names in the function
     /// @param function A function from a hash map of variable name-value pairs to
-    /// a value of type `T`
-    public FunctionParser(String signature, String valueRegex, Parser<String> variableParser, Function<HashMap<String, String>, T> function) {
+    /// a supplier of a value of type `T`
+    public FunctionParser(String signature, String valueRegex, Parser<String> variableParser, Function<HashMap<String, String>, Supplier<T>> function) {
         super(
                 s -> {
                     RegExParser regex = SIGNATURES.get(signature);
@@ -107,7 +111,7 @@ public class FunctionParser<T> extends Parser<Supplier<T>> {
                             variables.put(k, supplierToken.value().get().toString());
                         }
                     });
-                    Supplier<T> supplier = () -> function.apply(variables);
+                    Supplier<T> supplier = function.apply(variables);
                     register(supplier);
                     return new Token<>(supplier, t.head(), t.follow(), true);
                 }
@@ -136,8 +140,74 @@ public class FunctionParser<T> extends Parser<Supplier<T>> {
     /// @param valueRegex A RegEx expression that specifies what values are
     /// permitted as a parameter input for the function
     /// @param function A function from a hash map of variable name-value pairs to
-    /// a value of type `T`
-    public FunctionParser(String signature, String valueRegex, Function<HashMap<String, String>, T> function) {
+    /// a supplier of a value of type `T`
+    public FunctionParser(String signature, String valueRegex, Function<HashMap<String, String>, Supplier<T>> function) {
+        this(signature, valueRegex, STANDARD_VARIABLE_REGEX, function);
+    }
+
+    /// A [Parser] subclass that parses for a specific function signature and applies a function
+    /// to the values specified in the signature.
+    ///
+    /// Parsing will return a [Supplier] that will return the result of the function.
+    /// Parsed suppliers are stored in [FunctionParser#ADDRESSES] with their address given by
+    /// [FunctionParser#supplierToAddress].
+    ///
+    /// Variable names in the signature should match the names of keys in a [HashMap] that the
+    /// function will use.
+    ///
+    /// Using [Parser#recursiveReplaceAll(String)] is recommended for fully parsing a layered functional statement.
+    ///
+    /// @param signature The signature of the function
+    /// @param valueRegex A hash map from variable names to RegEx expressions specifying what values are permitted
+    /// as a parameter input for that variable
+    /// @param variableParser A parser for variable names in the function
+    /// @param function A function from a hash map of variable name-value pairs to
+    /// a supplier of a value of type `T`
+    public FunctionParser(String signature, HashMap<String, String> valueRegex, Parser<String> variableParser, Function<HashMap<String, String>, Supplier<T>> function) {
+        super(
+                s -> {
+                    RegExParser regex = SIGNATURES.get(signature);
+                    Token<String> t = regex.parse(s);
+                    if (!t.success()) { return new Token<>(null, "", s, false); }
+                    HashMap<String, String> variables = regex.getNamedGroups(s).value();
+                    variables.forEach((k, v) -> {
+                        Token<Supplier<?>> supplierToken = FUNCTION_FETCHER.parse(v);
+                        if (supplierToken.success()) {
+                            variables.put(k, supplierToken.value().get().toString());
+                        }
+                    });
+                    Supplier<T> supplier = function.apply(variables);
+                    register(supplier);
+                    return new Token<>(supplier, t.head(), t.follow(), true);
+                }
+        );
+        String signatureRegex = variableParser.replaceAll(
+                RegExParser.REGEX_META_CHARACTERS.replaceAll(signature, c -> "\\" + c),
+                value -> "(?<" + value + ">(?:§[\\da-z]x[\\da-z]{16}@[\\da-z]+§|" + valueRegex.get(value) + "))");
+        RegExParser signatureRegexParser = new RegExParser(signatureRegex);
+        SIGNATURES.put(signature, signatureRegexParser);
+    }
+
+    /// A [Parser] subclass that parses for a specific function signature and applies a function
+    /// to the values specified in the signature.
+    ///
+    /// Parsing will return a [Supplier] that will return the result of the function.
+    /// Parsed suppliers are stored in [FunctionParser#ADDRESSES] with their address given by
+    /// [FunctionParser#supplierToAddress].
+    ///
+    /// Variable names in the signature should match the names of keys in a [HashMap] that the
+    /// function will use.
+    ///
+    /// Using [Parser#recursiveReplaceAll(String)] is recommended for fully parsing a layered functional statement.
+    ///
+    /// Uses [FunctionParser#STANDARD_VARIABLE_REGEX] as the variable [Parser].
+    ///
+    /// @param signature The signature of the function
+    /// @param valueRegex A hash map from variable names to RegEx expressions specifying what values are permitted
+    /// as a parameter input for that variable
+    /// @param function A function from a hash map of variable name-value pairs to
+    /// a supplier of a value of type `T`
+    public FunctionParser(String signature, HashMap<String, String> valueRegex, Function<HashMap<String, String>, Supplier<T>> function) {
         this(signature, valueRegex, STANDARD_VARIABLE_REGEX, function);
     }
 

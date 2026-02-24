@@ -1,10 +1,10 @@
-package com.epra.eprascript.math_parsers;
+package com.epra.eprascript.parsers.math;
 
-import com.epra.eprascript.basic_parsers.CharParser;
-import com.epra.eprascript.parser_modifiers.Combinator;
-import com.epra.eprascript.parser_modifiers.Map;
-import com.epra.eprascript.basic_parsers.Token;
-import com.epra.eprascript.basic_parsers.Parser;
+import com.epra.eprascript.parsers.alphanumeric.CharParser;
+import com.epra.eprascript.parsers.modifiers.Combinator;
+import com.epra.eprascript.parsers.modifiers.Map;
+import com.epra.eprascript.parsers.Token;
+import com.epra.eprascript.parsers.Parser;
 
 import java.util.ArrayList;
 

@@ -1,6 +1,8 @@
-package com.epra.eprascript.basic_parsers;
+package com.epra.eprascript.parsers.alphanumeric;
 
-import com.epra.eprascript.parser_modifiers.Combinator;
+import com.epra.eprascript.parsers.Parser;
+import com.epra.eprascript.parsers.Token;
+import com.epra.eprascript.parsers.modifiers.Combinator;
 
 import java.util.HashMap;
 
