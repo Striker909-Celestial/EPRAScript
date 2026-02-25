@@ -16,6 +16,8 @@ public class AssignmentParser<T> extends FunctionParser<FunctionParser<T>>{
     /// A [TreeMap] from all variable names (strings) to the corresponding [FunctionParser] for parsing that
     /// variable.
     ///
+    /// A leading `#` is inserted into each variable name.
+    ///
     /// Ordered by variable name length, from longest to shortest.
     private static final TreeMap<String, FunctionParser> ASSIGNMENTS = new TreeMap<>(Comparator.reverseOrder());
     /// A [Parser] that fetches assigned variables by running through all parsers in [AssignmentParser#ASSIGNMENTS].
@@ -35,8 +37,6 @@ public class AssignmentParser<T> extends FunctionParser<FunctionParser<T>>{
             }
     );
     /// A [FunctionParser] for assigning values to variables that can then be used later.
-    ///
-    /// **Currently highly unstable.**
     /// @param valueRegex A RegEx expression that specifies what values are
     /// permitted as a value of a variable assignment
     /// @param valueParser A parser to parse the value of a variable assignment
@@ -53,14 +53,15 @@ public class AssignmentParser<T> extends FunctionParser<FunctionParser<T>>{
                     return new Token<>(token.value().substring(2, token.value().length() - 2), token.head(), token.follow(), true);
                 }),
                 (vals) -> {
-                    Supplier<T> supplier = () -> valueParser.parse(vals.get("value")).value();
+                    var value = valueParser.parse(vals.get("value")).value();
+                    Supplier<T> supplier = () -> value;
                     // System.out.println(supplier);
                     FunctionParser<T> fpOut = new FunctionParser<>(
-                            vals.get("name"),
-                            "",
-                            (hm) -> supplier
+                            "#" + vals.get("name"),
+                            "[a-zA-Z_][a-zA-Z_\\d]*",
+                            (map) -> supplier
                     );
-                    ASSIGNMENTS.put(vals.get("name"), fpOut);
+                    ASSIGNMENTS.put("#" + vals.get("name"), fpOut);
                     return () -> fpOut;
                 }
         );
