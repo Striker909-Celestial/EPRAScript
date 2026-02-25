@@ -53,14 +53,15 @@ public class AssignmentParser<T> extends FunctionParser<FunctionParser<T>>{
                     return new Token<>(token.value().substring(2, token.value().length() - 2), token.head(), token.follow(), true);
                 }),
                 (vals) -> {
-                    Supplier<T> supplier = () -> valueParser.parse(vals.get("value")).value();
+                    var value = valueParser.parse(vals.get("value")).value();
+                    Supplier<T> supplier = () -> value;
                     // System.out.println(supplier);
                     FunctionParser<T> fpOut = new FunctionParser<>(
-                            vals.get("name"),
-                            "",
-                            (hm) -> supplier
+                            "#" + vals.get("name"),
+                            "[a-zA-Z_][a-zA-Z_\\d]*",
+                            (map) -> supplier
                     );
-                    ASSIGNMENTS.put(vals.get("name"), fpOut);
+                    ASSIGNMENTS.put("#" + vals.get("name"), fpOut);
                     return () -> fpOut;
                 }
         );
