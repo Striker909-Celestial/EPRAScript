@@ -5,6 +5,7 @@ import com.epra.eprascript.parsers.Token;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Supplier;
 /// A [FunctionParser] for assigning values to variables that can then be used later.
@@ -16,8 +17,6 @@ public class AssignmentParser<T> extends FunctionParser<FunctionParser<T>>{
     /// A [TreeMap] from all variable names (strings) to the corresponding [FunctionParser] for parsing that
     /// variable.
     ///
-    /// A leading `#` is inserted into each variable name.
-    ///
     /// Ordered by variable name length, from longest to shortest.
     private static final TreeMap<String, FunctionParser> ASSIGNMENTS = new TreeMap<>(Comparator.reverseOrder());
     /// A [Parser] that fetches assigned variables by running through all parsers in [AssignmentParser#ASSIGNMENTS].
@@ -27,13 +26,14 @@ public class AssignmentParser<T> extends FunctionParser<FunctionParser<T>>{
     @SuppressWarnings("unchecked")
     public static final Parser<?> ASSIGNMENT_FETCHER = new Parser<>(
             s -> {
-                for (String key : ASSIGNMENTS.keySet()) {
-                    Token<Supplier<?>> token = ASSIGNMENTS.get(key).parse(s);
+                String sNew = FunctionParser.FUNCTION_FETCHER.recursiveReplaceAll(s, "");
+                for (Map.Entry<String, FunctionParser> entry : ASSIGNMENTS.entrySet()) {
+                    Token<Supplier<?>> token = entry.getValue().parse(sNew);
                     if (token.success()) {
                         return new Token<>(token.value(), token.head(), token.follow(), true);
                     }
                 }
-                return new Token<>(null, "", s, false);
+                return new Token<>(null, "", sNew, false);
             }
     );
     /// A [FunctionParser] for assigning values to variables that can then be used later.
@@ -55,13 +55,12 @@ public class AssignmentParser<T> extends FunctionParser<FunctionParser<T>>{
                 (vals) -> {
                     var value = valueParser.parse(vals.get("value")).value();
                     Supplier<T> supplier = () -> value;
-                    // System.out.println(supplier);
                     FunctionParser<T> fpOut = new FunctionParser<>(
-                            "#" + vals.get("name"),
+                            vals.get("name"),
                             "[a-zA-Z_][a-zA-Z_\\d]*",
                             (map) -> supplier
                     );
-                    ASSIGNMENTS.put("#" + vals.get("name"), fpOut);
+                    ASSIGNMENTS.put(vals.get("name"), fpOut);
                     return () -> fpOut;
                 }
         );
